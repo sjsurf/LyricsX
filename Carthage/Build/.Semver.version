@@ -1,0 +1,9 @@
+{
+  "commitish" : "v0.1.2",
+  "Mac" : [
+    {
+      "name" : "Semver",
+      "hash" : "c1c14f3f342ac336602bcb72d89abb7533d630e39f02b90caa2d1e399f12fb82"
+    }
+  ]
+}

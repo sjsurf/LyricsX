@@ -1,0 +1,9 @@
+{
+  "commitish" : "v0.2.2",
+  "Mac" : [
+    {
+      "name" : "OpenCC",
+      "hash" : "24ba5a24a4359bae899d2099113457f8f4847544c012fc7440d96d63da5c0462"
+    }
+  ]
+}

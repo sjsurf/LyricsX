@@ -1,0 +1,9 @@
+{
+  "commitish" : "v0.1.1",
+  "Mac" : [
+    {
+      "name" : "MusicPlayer",
+      "hash" : "dd326a6cd619f1cb55dc59e2dd8d01f009a6156e4f8d3af64c183ecb71a0abe3"
+    }
+  ]
+}

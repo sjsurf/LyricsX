@@ -1,0 +1,4 @@
+framework module Semver {
+    header "Semver-Swift.h"
+    requires objc
+}

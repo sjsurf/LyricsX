@@ -1,0 +1,11 @@
+framework module OpenCC {
+  umbrella header "OpenCC.h"
+
+  export *
+  module * { export * }
+}
+
+module OpenCC.Swift {
+    header "OpenCC-Swift.h"
+    requires objc
+}

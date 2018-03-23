@@ -1,0 +1,4 @@
+framework module MusicPlayer {
+    header "MusicPlayer-Swift.h"
+    requires objc
+}

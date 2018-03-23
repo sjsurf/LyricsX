@@ -1,0 +1,9 @@
+{
+  "commitish" : "v0.3.0",
+  "Mac" : [
+    {
+      "name" : "GenericID",
+      "hash" : "63e9db3343dd37c8c6d6538ba4f101ee2a1a9f9262f788c7e36f133ed66f416b"
+    }
+  ]
+}
