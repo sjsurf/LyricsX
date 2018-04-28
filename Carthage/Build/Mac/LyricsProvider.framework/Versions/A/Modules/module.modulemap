@@ -1,0 +1,4 @@
+framework module LyricsProvider {
+    header "LyricsProvider-Swift.h"
+    requires objc
+}

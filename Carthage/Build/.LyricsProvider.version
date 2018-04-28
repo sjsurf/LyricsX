@@ -1,0 +1,9 @@
+{
+  "commitish" : "v0.4.1",
+  "Mac" : [
+    {
+      "name" : "LyricsProvider",
+      "hash" : "cc67b6efcde1101a6d6677ebad228aa4be34538d68fa34b64f8b3ad822f0a40e"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+framework module GenericID {
+    header "GenericID-Swift.h"
+    requires objc
+}
