@@ -89,11 +89,8 @@ class AppController: NSObject, MusicPlayerManagerDelegate {
             return content
         }.joined(separator: "\n")
         // swiftlint:disable:next force_try
-        let regex = try! NSRegularExpression(pattern: "\\n{3}")
-        content = regex.stringByReplacingMatches(in: content,
-                                                 range: NSRange(location: 0, length: content.utf16.count),
-                                                 withTemplate: "\n\n")
-            .trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
+        let regex = try! Regex("\\n{3}")
+        _ = regex.replaceMatches(in: &content, withTemplate: "\n\n")
         if let converter = ChineseConverter.shared {
             content = converter.convert(content)
         }
@@ -208,13 +205,13 @@ class AppController: NSObject, MusicPlayerManagerDelegate {
             timer?.fireDate = .distantFuture
             return
         }
-        let (index, next) = lyrics[position + lyrics.timeDelay]
+        let (index, next) = lyrics[position + lyrics.adjustedTimeDelay]
         if currentLineIndex != index {
             currentLineIndex = index
             NotificationCenter.default.post(name: .lyricsShouldDisplay, object: nil)
         }
         if let next = next {
-            timer?.fireDate = Date() + lyrics.lines[next].position - lyrics.timeDelay - position
+            timer?.fireDate = Date() + lyrics.lines[next].position - lyrics.adjustedTimeDelay - position
         } else {
             timer?.fireDate = .distantFuture
         }

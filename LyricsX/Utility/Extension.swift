@@ -22,35 +22,6 @@ import Cocoa
 import LyricsProvider
 import MusicPlayer
 
-extension CountableRange {
-    
-    func clamp(_ value: Bound) -> Bound {
-        return Swift.min(upperBound.advanced(by: -1), Swift.max(lowerBound, value))
-    }
-}
-
-extension NSObject {
-    
-    func bind<T>(_ binding: NSBindingName,
-                 to observable: UserDefaults,
-                 withDefaultName defaultName: UserDefaults.DefaultsKey<T>,
-                 options: [NSBindingOption: Any] = [:]) {
-        var options = options
-        if let transformer = defaultName.valueTransformer {
-            switch transformer {
-            case is UserDefaults.KeyedArchiveValueTransformer:
-                options[.valueTransformerName] = NSValueTransformerName.keyedUnarchiveFromDataTransformerName
-            case is UserDefaults.ArchiveValueTransformer:
-                options[.valueTransformerName] = NSValueTransformerName.unarchiveFromDataTransformerName
-            default:
-                break
-            }
-        }
-        
-        bind(binding, to: observable, withKeyPath: defaultName.key, options: options)
-    }
-}
-
 extension MusicPlayerName {
     
     init?(index: Int) {
@@ -83,6 +54,12 @@ extension UserDefaults {
                       size: CGFloat(self[.DesktopLyricsFontSize]),
                       fallback: self[.DesktopLyricsFontNameFallback])
             ?? NSFont.systemFont(ofSize: CGFloat(self[.DesktopLyricsFontSize]))
+    }
+    
+    var lyricsWindowFont: NSFont {
+        return NSFont(name: defaults[.LyricsWindowFontName],
+                      size: CGFloat(defaults[.LyricsWindowFontSize]))
+            ?? NSFont.labelFont(ofSize: CGFloat(defaults[.DesktopLyricsFontSize]))
     }
 }
 
@@ -197,6 +174,37 @@ extension Lyrics {
         }
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         filtrate(isIncluded: predicate)
+    }
+}
+
+extension Lyrics {
+    
+    var adjustedOffset: Int {
+        return offset + defaults[.GlobalLyricsOffset]
+    }
+    
+    var adjustedTimeDelay: TimeInterval {
+        return TimeInterval(adjustedOffset) / 1000
+    }
+}
+
+extension NSTextField {
+    
+    @available(macOS, obsoleted: 10.12)
+    convenience init(labelWithString stringValue: String) {
+        self.init()
+        self.stringValue = stringValue
+        isEditable = false
+        isSelectable = false
+        textColor = .labelColor
+        backgroundColor = .controlColor
+        drawsBackground = false
+        isBezeled = false
+        alignment = .natural
+        font = NSFont.systemFont(ofSize: NSFont.systemFontSize(for: controlSize))
+        lineBreakMode = .byClipping
+        cell?.isScrollable = true
+        cell?.wraps = false
     }
 }
 
