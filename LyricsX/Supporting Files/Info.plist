@@ -19,11 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.4.0</string>
 	<key>CFBundleVersion</key>
-<<<<<<< HEAD
-	<string>1710</string>
-=======
-	<string>1829</string>
->>>>>>> upstream/master
+	<string>1834</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
