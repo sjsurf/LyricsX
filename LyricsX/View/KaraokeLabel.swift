@@ -24,46 +24,45 @@ class KaraokeLabel: NSTextField {
     
     @objc dynamic var isVertical = false {
         didSet {
-            invalidateContent()
+            clearCache()
             invalidateIntrinsicContentSize()
         }
     }
     
     @objc dynamic var drawFurigana = false {
         didSet {
-            invalidateContent()
+            clearCache()
             invalidateIntrinsicContentSize()
         }
     }
     
     override var attributedStringValue: NSAttributedString {
         didSet {
-            invalidateContent()
+            clearCache()
         }
     }
     
     override var stringValue: String {
         didSet {
-            invalidateContent()
+            clearCache()
         }
     }
     
     @objc override dynamic var font: NSFont? {
         didSet {
-            invalidateContent()
+            clearCache()
         }
     }
     
     @objc override dynamic var textColor: NSColor? {
         didSet {
-            invalidateContent()
+            clearCache()
         }
     }
     
-    private var isContentInvalid = false
-    
-    private func invalidateContent() {
-        isContentInvalid = true
+    private func clearCache() {
+        _attrString = nil
+        _ctFrame = nil
         needsLayout = true
         needsDisplay = true
         removeProgressAnimation()
@@ -71,39 +70,38 @@ class KaraokeLabel: NSTextField {
     
     private var _attrString: NSAttributedString?
     private var attrString: NSAttributedString {
-        if !isContentInvalid, let attrString = _attrString {
+        if let attrString = _attrString {
             return attrString
         }
         let attrString = NSMutableAttributedString(attributedString: attributedStringValue)
         let string = attrString.string as NSString
-        let lan = string.dominantLanguage
-        let shouldDrawFurigana = drawFurigana && lan == "ja"
-        let tokenizer = CFStringTokenizer.create(string, locale: lan.map(NSLocale.init))
-        for tokenType in tokenizer {
-            guard tokenType.contains(.isCJWordMask) else { continue }
-            let range = tokenizer.currentTokenRange()
-            attrString.addAttributes([.verticalGlyphForm: isVertical], range: range)
-            
+        let shouldDrawFurigana = drawFurigana && string.dominantLanguage == "ja"
+        let tokenizer = CFStringTokenizer.create(string)
+        for tokenType in tokenizer where tokenType.contains(.isCJWordMask) {
+            if isVertical {
+                let tokenRange = tokenizer.currentTokenRange()
+                let attr: [NSAttributedStringKey: Any] = [
+                    .verticalGlyphForm: true,
+                    .baselineOffset: (font?.pointSize ?? 24) * 0.25,
+                ]
+                attrString.addAttributes(attr, range: tokenRange)
+            }
             guard shouldDrawFurigana else { continue }
-            let tokenStr = string.substring(with: range) as NSString
-            if let latin = tokenizer.currentTokenAttribute(.latinTranscription),
-                let katakana = latin.applyingTransform(.latinToKatakana, reverse: false) as NSString?,
-                let hiragana = latin.applyingTransform(.latinToHiragana, reverse: false) as NSString?,
-                katakana.length > 0,
-                katakana != tokenStr,
-                hiragana != tokenStr {
-                let annotation = CTRubyAnnotation.create(hiragana)
-                attrString.addAttribute(kCTRubyAnnotationAttributeName as NSAttributedStringKey, value: annotation, range: range)
+            if let (furigana, range) = tokenizer.currentFuriganaAnnotation(in: string) {
+                var attr: [NSAttributedStringKey: Any] = [.rubyAnnotationSizeFactor: 0.5]
+                attr[.foregroundColor] = textColor // Set ruby text color but it seems doesn't work.
+                let annotation = CTRubyAnnotation.create(furigana, attributes: attr)
+                attrString.addAttribute(.rubyAnnotation, value: annotation, range: range)
             }
         }
-        attrString.addAttributes([NSAttributedStringKey.foregroundColor: textColor!], range: attrString.fullRange)
+        textColor?.do { attrString.addAttributes([.foregroundColor: $0], range: attrString.fullRange) }
         _attrString = attrString
         return attrString
     }
     
     private var _ctFrame: CTFrame?
     private var ctFrame: CTFrame {
-        if !isContentInvalid, let ctFrame = _ctFrame {
+        if let ctFrame = _ctFrame {
             return ctFrame
         }
         layoutSubtreeIfNeeded()
